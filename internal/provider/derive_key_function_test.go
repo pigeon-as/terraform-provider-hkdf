@@ -78,7 +78,10 @@ func TestDeriveEd25519PEM(t *testing.T) {
 		if err != nil {
 			t.Fatalf("parse PKCS8: %v", err)
 		}
-		edKey := key.(ed25519.PrivateKey)
+		edKey, ok := key.(ed25519.PrivateKey)
+		if !ok {
+			t.Fatal("expected ed25519.PrivateKey")
+		}
 		// Verify it's a valid 64-byte Ed25519 key.
 		if len(edKey) != ed25519.PrivateKeySize {
 			t.Fatalf("key size = %d, want %d", len(edKey), ed25519.PrivateKeySize)
