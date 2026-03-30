@@ -14,10 +14,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/tfversion"
 )
 
-func TestAccSHA256Function_basic(t *testing.T) {
+func TestSHA256Function_basic(t *testing.T) {
+	t.Parallel()
 	secret := base64.StdEncoding.EncodeToString([]byte("test secret"))
 
-	resource.Test(t, resource.TestCase{
+	resource.UnitTest(t, resource.TestCase{
 		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
 			tfversion.SkipBelow(tfversion.Version1_8_0),
 		},
@@ -39,8 +40,9 @@ output "result" {
 	})
 }
 
-func TestAccSHA256Function_invalidBase64(t *testing.T) {
-	resource.Test(t, resource.TestCase{
+func TestSHA256Function_invalidBase64(t *testing.T) {
+	t.Parallel()
+	resource.UnitTest(t, resource.TestCase{
 		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
 			tfversion.SkipBelow(tfversion.Version1_8_0),
 		},
@@ -58,10 +60,11 @@ output "result" {
 	})
 }
 
-func TestAccDeriveKeyFunction_ed25519(t *testing.T) {
+func TestDeriveKeyFunction_ed25519(t *testing.T) {
+	t.Parallel()
 	secret := base64.StdEncoding.EncodeToString([]byte("test-secret-for-key-derivation!!"))
 
-	resource.Test(t, resource.TestCase{
+	resource.UnitTest(t, resource.TestCase{
 		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
 			tfversion.SkipBelow(tfversion.Version1_8_0),
 		},
@@ -84,10 +87,11 @@ output "key" {
 	})
 }
 
-func TestAccDeriveKeyFunction_unsupportedAlgorithm(t *testing.T) {
+func TestDeriveKeyFunction_unsupportedAlgorithm(t *testing.T) {
+	t.Parallel()
 	secret := base64.StdEncoding.EncodeToString([]byte("test secret"))
 
-	resource.Test(t, resource.TestCase{
+	resource.UnitTest(t, resource.TestCase{
 		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
 			tfversion.SkipBelow(tfversion.Version1_8_0),
 		},
@@ -106,6 +110,7 @@ output "key" {
 }
 
 func TestAccDeriveKeyFunction_withTLSSelfSignedCert(t *testing.T) {
+	t.Parallel()
 	secret := base64.StdEncoding.EncodeToString([]byte("test-secret-for-tls-integration!"))
 
 	resource.Test(t, resource.TestCase{
@@ -137,11 +142,7 @@ output "cert" {
   value = tls_self_signed_cert.ca.cert_pem
 }
 `,
-				ConfigPlanChecks: resource.ConfigPlanChecks{
-					PreApply: []plancheck.PlanCheck{
-						plancheck.ExpectKnownOutputValue("cert", knownvalue.NotNull()),
-					},
-				},
+				Check: resource.TestCheckResourceAttrSet("tls_self_signed_cert.ca", "cert_pem"),
 			},
 		},
 	})
