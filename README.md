@@ -4,6 +4,8 @@ Derives deterministic key material using [HKDF-SHA256](https://datatracker.ietf.
 
 ## Usage
 
+### Data Source
+
 ```hcl
 provider "hkdf" {}
 
@@ -19,9 +21,29 @@ output "derived_key" {
 }
 ```
 
+### Provider Functions (Terraform 1.8+)
+
+```hcl
+# Derive raw bytes (base64)
+output "derived_bytes" {
+  value     = provider::hkdf::sha256(var.secret_base64, "my-app token", 32)
+  sensitive = true
+}
+
+# Derive an Ed25519 private key (PEM) — use with tls_self_signed_cert
+resource "tls_self_signed_cert" "ca" {
+  private_key_pem = provider::hkdf::derive_key(var.secret_base64, "my-app ca key v1", "ed25519")
+
+  subject { common_name = "my-app" }
+  validity_period_hours = 876000
+  is_ca_certificate     = true
+  allowed_uses          = ["cert_signing"]
+}
+```
+
 ## Requirements
 
-- Terraform >= 1.0
+- Terraform >= 1.8 (for provider functions), >= 1.0 (for data sources only)
 - Go >= 1.25 (building from source)
 
 ## Building

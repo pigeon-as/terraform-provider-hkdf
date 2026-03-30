@@ -7,12 +7,14 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/function"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
 var _ provider.Provider = &HKDFProvider{}
+var _ provider.ProviderWithFunctions = &HKDFProvider{}
 
 // HKDFProvider implements the hkdf provider.
 type HKDFProvider struct {
@@ -41,6 +43,13 @@ func (p *HKDFProvider) Resources(_ context.Context) []func() resource.Resource {
 func (p *HKDFProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		NewHKDFSHA256DataSource,
+	}
+}
+
+func (p *HKDFProvider) Functions(_ context.Context) []func() function.Function {
+	return []func() function.Function{
+		NewSHA256Function,
+		NewDeriveKeyFunction,
 	}
 }
 
