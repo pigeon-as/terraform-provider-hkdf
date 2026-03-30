@@ -26,13 +26,13 @@ output "derived_key" {
 ```hcl
 # Derive raw bytes (base64)
 output "derived_bytes" {
-  value     = provider::hkdf::sha256(var.secret, "my-app token", 32)
+  value     = provider::hkdf::sha256(var.secret_base64, "my-app token", 32)
   sensitive = true
 }
 
 # Derive an Ed25519 private key (PEM) — use with tls_self_signed_cert
 resource "tls_self_signed_cert" "ca" {
-  private_key_pem = provider::hkdf::derive_key(var.secret, "my-app ca key v1", "ed25519")
+  private_key_pem = provider::hkdf::derive_key(var.secret_base64, "my-app ca key v1", "ed25519")
 
   subject { common_name = "my-app" }
   validity_period_hours = 876000
